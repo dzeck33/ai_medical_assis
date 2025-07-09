@@ -55,6 +55,7 @@ export default function HeroSectionOne() {
         >
           Empower your healthcare journey with advanced AI solutions for faster, smarter, and more accurate medical support. 🩺
         </motion.p>
+        <Link href="/sign-in">
         <motion.div
           initial={{
             opacity: 0,
@@ -71,10 +72,9 @@ export default function HeroSectionOne() {
           <button className="w-60 transform rounded-lg bg-black px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
             Explore Now
           </button>
-          <button className="w-60 transform rounded-lg border border-gray-300 bg-white px-6 py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-100 dark:border-gray-700 dark:bg-black dark:text-white dark:hover:bg-gray-900">
-            Contact Support
-          </button>
+      
         </motion.div>
+        </Link>
         <motion.div
           initial={{
             opacity: 0,
