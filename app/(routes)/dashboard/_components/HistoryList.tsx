@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import AddNewSessions from "./AddNewSessions";
 function HistoryList() {
     const [historyList] = useState([]);
     return (
@@ -15,9 +16,7 @@ function HistoryList() {
                     <p className="text-gray-500 mt-2">
                         Start your first consultation with a doctor.
                     </p>
-                    <Button className="mt-3 ">
-                        +Consult A Doctor
-                    </Button>
+                    <AddNewSessions />
                 </div>:
                 <div>List of History</div>
             }
