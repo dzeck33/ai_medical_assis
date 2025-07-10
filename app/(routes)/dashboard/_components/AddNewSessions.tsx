@@ -15,11 +15,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowRight, Loader2, Loader2Icon } from "lucide-react";
 import axios from "axios";
 import DoctorAgentCard, { doctorAgent } from "./DoctorAgentCard";
+import SuggestDoctorCard from "./SuggestDoctorCard";
 
 function AddNewSessions() {
     const [note,setnote]=useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
     const [suggestedDoctor, setSuggestedDoctor] = useState<doctorAgent[]>();
+    const [selectedDoctor, setSelectedDoctor] = useState<doctorAgent>();
     const OnClickNext = async () => {
         setLoading(true);
         const result = await axios.post("/api/suggest-doctor", {
@@ -39,20 +41,30 @@ function AddNewSessions() {
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Add Basic Details</DialogTitle>
+                    <DialogTitle></DialogTitle>
                     <DialogDescription asChild>
-                        { !suggestedDoctor ?
+                        {!suggestedDoctor ? 
                         <div>
                             <h2>
                                 Add Symptoms, Medical History, and Other Details
                                 <Textarea placeholder="Add Detail here..." className="h-[200px] mt-1.5" onChange={(e)=> setnote(e.target.value)}/>
                             </h2>
                         </div>:
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {/* Display suggested doctors */}
-                            {suggestedDoctor.map((doctor,index)=>(
-                                <DoctorAgentCard doctorAgent={doctor} key={index} />
-                            ))}
+                        <div>
+                            <h2 className="text-lg font-semibold mb-4">
+                                Suggested Doctors based on your symptoms
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {/* Display suggested doctors */}
+                                {suggestedDoctor?.map((doctor,index)=>(
+                                    <SuggestDoctorCard key={index} doctorAgent={doctor}
+                                     setSelectedDoctor={() => {
+                                        setSelectedDoctor(doctor);
+                                     }}
+                                    />
+
+                                ))}
+                            </div>
                         </div>
                         }
                     </DialogDescription>
@@ -63,8 +75,8 @@ function AddNewSessions() {
                             Cancel
                         </Button>
                     </DialogClose>
-                    {!suggestedDoctor?
-                    <Button disabled={!note} onClick={OnClickNext} className="ml-2">
+                    {!suggestedDoctor ?
+                    <Button disabled={!note || loading} onClick={OnClickNext} className="ml-2">
                         {loading && <Loader2 className='animate-spin' />}
                         Next <ArrowRight/>
                     </Button>:

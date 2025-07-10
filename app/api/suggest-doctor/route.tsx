@@ -5,13 +5,52 @@ import { AIDoctorAgents } from "@/shared/list";
 export async function POST(req: NextRequest) {
     const {notes}= await req.json();
     try{
-        const completion = await openai.chat.completions.create({
-            model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
-            messages: [
-                { role: "system", content: JSON.stringify(AIDoctorAgents) },
-              { role: "user", content: "User Notes/Symptoms" + notes+"Depending on the User notes and symptoms,Please Suggest list of doctors, Return object in JSON only" },
-            ],
-          })
+      const completion = await openai.chat.completions.create({
+        model: "deepseek/deepseek-r1-0528-qwen3-8b:free",
+        messages: [
+          {
+            role: "system",
+            content: `
+      You are a medical assistant AI. Use the provided doctor agent list to match user symptoms to appropriate doctors.
+      Return results in a clean JSON array format.
+      Each item must include: id, speacialist, description, image and agentPrompt
+      Do not include any explanation or markdown (e.g., no \`\`\`json).
+      Here is the list of available doctor agents:
+      ${JSON.stringify(AIDoctorAgents)}
+            `.trim()
+          },
+          {
+            role: "user",
+            content: `
+      User Notes/Symptoms:
+      ${notes}
+      
+      Based on the above symptoms, return the most relevant doctors.
+      
+      Return strictly in the following JSON format:
+      
+          [
+        {
+          "id": 1,
+          "specialist": "Cardiologist",
+          "description": "Expert in diagnosing and treating heart-related symptoms.",
+          "image": "/doctor1.png",
+          "agentPrompt": "Analyze for chest pain, shortness of breath, and other cardiovascular signs."
+        },
+        {
+          "id": 2,
+          "specialist": "General Physician",
+          "description": "Handles general health concerns and directs patients to specialists if needed.",
+          "image": "/doctor2.png",
+          "agentPrompt": "Initial assessment for fever, fatigue, and common ailments."
+        }
+      ]
+
+            `.trim()
+          }
+        ]
+      });
+      
         const rawResponse = completion.choices[0].message;
         //@ts-ignore
         const resp=rawResponse.content.trim().replace('```json', '').replace('```', '');
