@@ -75,6 +75,8 @@ function AddNewSessions() {
                                      setSelectedDoctor={() => {
                                         setSelectedDoctor(doctor);
                                      }}
+                                     //@ts-ignore
+                                     selectedDoctor={selectedDoctor}
                                     />
 
                                 ))}
@@ -94,7 +96,7 @@ function AddNewSessions() {
                         {loading && <Loader2 className='animate-spin' />}
                         Next <ArrowRight/>
                     </Button>:
-                    <Button onClick={() => {
+                    <Button disabled={loading||!selectedDoctor} onClick={() => {
                         onStartConsultation();
                     }}>
                         Start Consultation
