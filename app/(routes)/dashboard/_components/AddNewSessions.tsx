@@ -16,13 +16,15 @@ import { ArrowRight, Loader2, Loader2Icon } from "lucide-react";
 import axios from "axios";
 import DoctorAgentCard, { doctorAgent } from "./DoctorAgentCard";
 import SuggestDoctorCard from "./SuggestDoctorCard";
+import { useRouter } from "next/navigation";
+
 
 function AddNewSessions() {
     const [note,setnote]=useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
     const [suggestedDoctor, setSuggestedDoctor] = useState<doctorAgent[]>();
     const [selectedDoctor, setSelectedDoctor] = useState<doctorAgent>();
-
+    const router=useRouter();
     const OnClickNext = async () => {
         setLoading(true);
         const result = await axios.post("/api/suggest-doctor", {
@@ -42,6 +44,8 @@ function AddNewSessions() {
         console.log(result.data);
         if(result.data?.sessionId){
             console.log("Session created successfully:", result.data.sessionId);
+            // Redirect to the medical voice agent page with sessionId
+            router.push(`/dashboard/medical-agent/${result.data.sessionId}`);
         }
         setLoading(false);
     };
