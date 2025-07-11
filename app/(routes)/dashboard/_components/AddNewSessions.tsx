@@ -22,6 +22,7 @@ function AddNewSessions() {
     const [loading, setLoading] = useState<boolean>(false);
     const [suggestedDoctor, setSuggestedDoctor] = useState<doctorAgent[]>();
     const [selectedDoctor, setSelectedDoctor] = useState<doctorAgent>();
+
     const OnClickNext = async () => {
         setLoading(true);
         const result = await axios.post("/api/suggest-doctor", {
@@ -30,6 +31,9 @@ function AddNewSessions() {
         console.log(result.data);
         setSuggestedDoctor(result.data);
         setLoading(false);
+    };
+    const onStartConsultation = () => {
+        // save in db
     };
 
     return (
@@ -80,7 +84,9 @@ function AddNewSessions() {
                         {loading && <Loader2 className='animate-spin' />}
                         Next <ArrowRight/>
                     </Button>:
-                    <Button>
+                    <Button onClick={() => {
+                        onStartConsultation();
+                    }}>
                         Start Consultation
                     </Button>
                     }
