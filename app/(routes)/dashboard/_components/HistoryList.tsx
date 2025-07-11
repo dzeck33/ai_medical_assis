@@ -8,7 +8,7 @@ function HistoryList() {
     return (
         <div className="mt-10">
             {historyList.length == 0 ? 
-                <div className="flex flex-col items-center justify-center p-7 border border-dashed rounded-2xl border-2">
+                <div className="flex flex-col items-center justify-center p-7 border-dashed rounded-2xl border-2">
                     <Image src="/medical_assistant.png" alt="Medical Assistant" width={150} height={150} />
                     <h2 className="text-lg font-semibold text-gray-700 mt-4">
                         No Consultation Made
