@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { doctorAgent } from "../../_components/DoctorAgentCard";
 import { Circle } from "lucide-react";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 type SessionDetail = {
     id: number;
@@ -32,7 +33,7 @@ function MedicalVoiceAgent() {
     };
 
     return (
-        <div>
+        <div className="p-3 border rounded-lg shadow-md bg-secondary">
             <div className="flex items-center justify-between gap-3 p-5 ">
                 <h2 className="p-1 px-2 border rounded-md flex items-center gap-2">
                     <Circle className="h-4 w-4" />
@@ -58,6 +59,9 @@ function MedicalVoiceAgent() {
                         <h2 className="text-gray-400">Agent Text</h2>
                         <h2 className="text-lg">User Text</h2>
                     </div>
+                    <Button className=" mt-12">
+                        Start Call 📞
+                    </Button>
                 </div>
             )}
         </div>
