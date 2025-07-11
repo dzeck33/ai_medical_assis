@@ -32,8 +32,18 @@ function AddNewSessions() {
         setSuggestedDoctor(result.data);
         setLoading(false);
     };
-    const onStartConsultation = () => {
+    const onStartConsultation = async () => {
         // save in db
+        setLoading(true);
+        const result =await axios.post("/api/session-chat", {
+            notes: note,
+            selectedDoctor: selectedDoctor,
+        });
+        console.log(result.data);
+        if(result.data?.sessionId){
+            console.log("Session created successfully:", result.data.sessionId);
+        }
+        setLoading(false);
     };
 
     return (
