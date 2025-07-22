@@ -35,14 +35,16 @@ export async function POST(req: NextRequest) {
           "specialist": "Cardiologist",
           "description": "Expert in diagnosing and treating heart-related symptoms.",
           "image": "/doctor1.png",
-          "agentPrompt": "Analyze for chest pain, shortness of breath, and other cardiovascular signs."
+          "agentPrompt": "Analyze for chest pain, shortness of breath, and other cardiovascular signs.",
+          "voiceId": "will",
         },
         {
           "id": 2,
           "specialist": "General Physician",
           "description": "Handles general health concerns and directs patients to specialists if needed.",
           "image": "/doctor2.png",
-          "agentPrompt": "Initial assessment for fever, fatigue, and common ailments."
+          "agentPrompt": "Initial assessment for fever, fatigue, and common ailments.",
+          "voiceId": "chris",
         }
       ]
 

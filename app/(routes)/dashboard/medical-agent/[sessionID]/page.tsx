@@ -11,11 +11,9 @@ type SessionDetail = {
     id: number;
     notes: string;
     sessionId: string;
-    createdBy: string;
     report: JSON;
     selectedDoctor: doctorAgent;
     createdOn: string;
-    conversation?: any;
 };
 
 type messages={
@@ -39,17 +37,45 @@ function MedicalVoiceAgent() {
     
     const getSessionDetails = async () => {
         const response = await axios.get(`/api/session-chat?sessionId=${sessionId}`);
-        console.log("Session detail response:", response.data);
+        console.log("Session detail response:", response);
         setsessionDetail(response.data);
     };
     
     const StartCall = async () => {
+        // setLoading(true);
         const vapi = new Vapi(process.env.NEXT_PUBLIC_VAPI_API_KEY!);
         setVapiInstance(vapi);
         // only when you start the call, you start the voice assistant
-        vapi.start(process.env.NEXT_PUBLIC_VAPI_VOICE_ASSISTANT_ID!);
         // Listen for events
-        vapi.on('call-start', () => {console.log('Call started')
+
+        const VapiConfig = {
+            name:'AI Medical Agent',
+            firstMessage:"Hi there! I am your AI Medical Agent. How can I assist you today?",
+            transcriber:{
+                provider:'assembly-ai',
+                language:'en'
+            },
+            voice:{
+                provider:'playht',
+                voiceId: sessionDetail?.selectedDoctor?.voiceId ?? 'will',
+            },
+            model:{
+                provider:'openai',
+                model:'gpt-4.1-nano',
+                messages:[
+                    {
+                        role:'system',
+                        content:sessionDetail?.selectedDoctor?.agentPrompt || "You are a helpful AI medical agent. Ask questions and provide advice based on the user's responses."
+                    }
+                ]
+            }
+        };
+        
+        console.log("Starting Vapi with config:", VapiConfig);
+        // @ts-ignore
+        vapi.start(VapiConfig);
+
+        vapi.on('call-start', () => {console.log('Call started', sessionDetail?.selectedDoctor?.voiceId);
             setCallStarted(true);
         });
         vapi.on('call-end', () => {
@@ -76,13 +102,13 @@ function MedicalVoiceAgent() {
             }
         });
 
-        vapiInstance.on('speech-start', () => {
+        vapi.on('speech-start', () => {
             console.log('Assistant started speaking');
             setCurrentRoll('assistant_roll');
         });
 
-        vapiInstance.on('speech-end', () => {
-        console.log('Assistant stopped speaking');
+        vapi.on('speech-end', () => {
+            console.log('Assistant stopped speaking');
             setCurrentRoll('user_roll');
         });
 
@@ -126,22 +152,54 @@ function MedicalVoiceAgent() {
                         <h2 className="font-semibold text-lg">{sessionDetail.selectedDoctor.specialist}</h2>
                         <p className="text-sm text-gray-500">AI Medical Agent</p>
                     </div>
-                    <div className="overflow-y-auto mt-10 flex flex-col items-center px-10 md:px-28 lg:px-40 xl:px-60">
-                        {
-                            messages?.slice(-4).map((msg : messages, index) => (
-                                <div>
-                                    <h2 key={index} className={`text-sm ${msg.role === 'user_roll' ? 'text-blue-500' : 'text-green-500'}`}>
-                                        {msg.role}: {msg.text}
-                                    </h2>
+                    <div className="overflow-y-auto mt-10 flex flex-col gap-4 px-6 md:px-28 lg:px-40 xl:px-60 w-full">
+                        {/* Previous messages */}
+                        {messages?.slice(-4).map((msg: messages, index) => (
+                            <div
+                                key={index}
+                                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                            >
+                                <div
+                                    className={`max-w-[75%] text-sm md:text-base leading-relaxed
+                                        ${msg.role === 'user' 
+                                            ? 'text-blue-800 bg-blue-50 rounded-lg px-4 py-2' 
+                                            : 'text-gray-800 bg-gray-100 rounded-lg px-4 py-2'}`}
+                                >
+                                    <span className="block font-semibold mb-1">
+                                        {msg.role === 'user' ? 'You' : 'Agent'}
+                                    </span>
+                                    <span>{msg.text}</span>
                                 </div>
-                            ))
-                        }
+                            </div>
+                        ))}
 
-                        {liveTranscripts && liveTranscripts?.length>0 && <h2 className="text-lg">{currentRoll} : {liveTranscripts}</h2>}
+                        {/* Live transcription */}
+                        {liveTranscripts && liveTranscripts.length > 0 && (
+                            <div
+                                className={`flex ${currentRoll === 'user' ? 'justify-end' : 'justify-start'}`}
+                            >
+                                <div
+                                    className={`max-w-[75%] text-sm md:text-base font-medium italic
+                                        ${currentRoll === 'user' 
+                                            ? 'text-blue-600 text-right' 
+                                            : 'text-green-700 text-left'}`}
+                                >
+                                    <span className="block font-semibold not-italic">
+                                        {currentRoll === 'user' ? 'You' : 'Agent'}
+                                    </span>
+                                    {liveTranscripts}
+                                </div>
+                            </div>
+                        )}
                     </div>
+
                     {!callStarted?
-                        <Button className=" mt-12" onClick={StartCall} disabled={callStarted}>
-                        Start Call 📞
+                        <Button
+                            className={`mt-12 transition-transform duration-150 active:scale-95 ${callStarted ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            onClick={StartCall}
+                            disabled={callStarted}
+                        >
+                            Start Call 📞
                         </Button>:
                         <Button className=" mt-12" variant={"destructive"} onClick={endCall}>
                         <PhoneOff/> End Call
@@ -154,3 +212,6 @@ function MedicalVoiceAgent() {
 }
 
 export default MedicalVoiceAgent;
+
+
+
